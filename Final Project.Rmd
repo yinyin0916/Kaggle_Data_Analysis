@@ -1,0 +1,899 @@
+---
+title: "Final Project"
+author: "Jingyu Wu & Rosy Xu"
+date: "2021/5/30"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+data = read.csv("kaggle_survey_2020_responses.csv")
+data = subset(data, Q1!="What is your age (# years)?")
+```
+
+//Section 2.1
+```{r}
+wanted_columns = c("Q6","Q15","Q24")
+data_2.1 = subset(data, select = wanted_columns)
+data_2.1 = subset(data_2.1, Q6!= "" & Q24 !="")
+```
+
+```{r}
+data_2.1_size = nrow(data_2.1)
+ind = seq(data_2.1_size)
+```
+
+```{r}
+for(i in ind){
+  Code_time = data_2.1$Q6[i]
+  ML_time = data_2.1$Q15[i]
+  total_time = 0
+  
+
+  if(Code_time == "< 1 years"){
+    total_time = total_time + 0.5
+  }
+  else if(Code_time == "1-2 years"){
+    total_time = total_time + 1.5
+  }
+  else if(Code_time == "3-5 years"){
+    total_time = total_time + 4
+  }
+  else if(Code_time == "5-10 years"){
+    total_time = total_time + 7.5
+  }
+  else if(Code_time == "10-20 years"){
+    total_time = total_time + 15
+  }
+  else if(Code_time == "20+ years"){
+    total_time = total_time + 30
+  }
+  
+  if(ML_time == "Under 1 year"){
+    total_time = total_time + 0.5
+  }
+  else if(ML_time == "1-2 years"){
+    total_time = total_time + 1.5
+  }
+  else if(ML_time == "2-3 years"){
+    total_time = total_time + 2.5
+  }
+  else if(ML_time == "3-4 years"){
+    total_time = total_time + 3.5
+  }
+  else if(ML_time == "4-5 years"){
+    total_time = total_time + 4.5
+  }
+  else if(ML_time == "5-10 years"){
+    total_time = total_time + 7.5
+  }
+  else if(ML_time == "10-20 years"){
+    total_time = total_time + 15
+  }
+  else if(ML_time == "20 or more years"){
+    total_time = total_time + 30
+  }
+  
+  data_2.1$Total_Time[i] = total_time
+}
+```
+
+
+```{r}
+summary(data_2.1$Total_Time)
+hist(data_2.1$Total_Time)
+```
+
+```{r}
+for(i in ind){
+  total_time = data_2.1$Total_Time[i]
+  
+  if(total_time == 0){
+    data_2.1$Grouping[i] = 1
+  }
+  else if(total_time <= 2){
+    data_2.1$Grouping[i] = 2
+  }
+  else if(total_time <= 5){
+    data_2.1$Grouping[i] = 3
+  }
+  else if(total_time <= 10){
+    data_2.1$Grouping[i] = 4
+  }
+  else if(total_time <= 20){
+    data_2.1$Grouping[i] = 5
+  }
+  else{
+    data_2.1$Grouping[i] = 6
+  }
+
+}
+```
+
+```{r}
+hist(data_2.1$Grouping, breaks = seq(0.5,6.5,length.out = 7),main= "Grouping",xlab = "group number")
+```
+
+```{r}
+for(i in ind){
+  comp = data_2.1$Q24[i]
+  
+  if(comp == "$0-999"){
+    data_2.1$comp_level[i] = 0.5
+  }
+  else if(comp == "1,000-1,999"){
+    data_2.1$comp_level[i] = 1.5
+  }
+  else if(comp == "2,000-2,999"){
+    data_2.1$comp_level[i] = 2.5
+  }
+  else if(comp == "3,000-3,999"){
+    data_2.1$comp_level[i] = 3.5
+  }
+  else if(comp == "4,000-4,999"){
+    data_2.1$comp_level[i] = 4.5
+  }
+  else if(comp == "5,000-7,499"){
+    data_2.1$comp_level[i] = 5.5
+  }
+  else if(comp == "7,500-9,999"){
+    data_2.1$comp_level[i] = 6.5
+  }
+  else if(comp == "10,000-14,999"){
+    data_2.1$comp_level[i] = 7.5
+  }
+  else if(comp == "15,000-19,999"){
+    data_2.1$comp_level[i] = 8.5
+  }
+  else if(comp == "20,000-24,999"){
+    data_2.1$comp_level[i] = 9.5
+  }
+  else if(comp == "25,000-29,999"){
+    data_2.1$comp_level[i] = 10.5
+  }
+  else if(comp == "30,000-39,999"){
+    data_2.1$comp_level[i] = 11.5
+  }
+  else if(comp == "40,000-49,999"){
+    data_2.1$comp_level[i] = 12.5
+  }
+  else if(comp == "50,000-59,999"){
+    data_2.1$comp_level[i] = 13.5
+  }
+  else if(comp == "60,000-69,999"){
+    data_2.1$comp_level[i] = 14.5
+  }
+  else if(comp == "70,000-79,999"){
+    data_2.1$comp_level[i] = 15.5
+  }
+  else if(comp == "80,000-89,999"){
+    data_2.1$comp_level[i] = 16.5
+  }
+  else if(comp == "90,000-99,999"){
+    data_2.1$comp_level[i] = 17.5
+  }
+  else if(comp == "100,000-124,999"){
+    data_2.1$comp_level[i] = 18.5
+  }
+  else if(comp == "125,000-149,999"){
+    data_2.1$comp_level[i] = 19.5
+  }
+  else if(comp == "150,000-199,999"){
+    data_2.1$comp_level[i] = 20.5
+  }
+  else if(comp == "200,000-249,999"){
+    data_2.1$comp_level[i] = 21.5
+  }
+  else if(comp == "250,000-299,999"){
+    data_2.1$comp_level[i] = 22.5
+  }
+  else if(comp == "300,000-500,000"){
+    data_2.1$comp_level[i] = 23.5
+  }
+  else if(comp == "> $500,000"){
+    data_2.1$comp_level[i] = 24.5
+  }
+}
+```
+
+```{r}
+hist(data_2.1$comp_level)
+```
+
+```{r}
+par(mfrow=c(3,2))
+headers = c("Time_group 1","Time_group 2","Time_group 3","Time_group 4","Time_group 5","Time_group 6")
+bks = seq(0,25, length.out = 26)
+for(i in seq(6)){
+  group_i = subset(data_2.1, Grouping == i)
+  
+  hist(group_i$comp_level,breaks = bks, freq = F, main = headers[i], xlab = "income_level")
+  group_mean = mean(group_i$comp_level)
+  abline(v = group_mean, col = "red")
+}
+```
+
+```{r}
+income = c(500,1500,2500,3500,4500,6250,8750,12500,17500,22500,27500,35000,45000,55000,65000,75000,85000,95000,112500,137500,175000,225000,275000,400000,600000)
+```
+
+```{r}
+avg_comp = seq(6)
+for(i in seq(6)){
+  group_i = subset(data_2.1, Grouping == i)
+  group_size = nrow(group_i)
+  sum = 0
+  for(j in seq(group_size)){
+    comp_level = group_i$comp_level[j] + 0.5
+    sum = sum + income[comp_level]
+  }
+  avg_comp[i] = sum/group_size
+}
+```
+
+```{r}
+plot(avg_comp, type = "o", xlab = "Group")
+```
+
+
+
+
+//Section 2.2
+```{r}
+income_min = c(0,1000,2000,3000,4000,5000,7500,10000,15000,20000,25000,30000,40000,50000,60000,70000,80000,90000,100000,125000,150000,200000,250000,300000,500000)
+
+income_max = 2*income-income_min
+```
+
+```{r}
+avg_max = seq(6)
+avg_min = seq(6)
+for(i in seq(6)){
+  group_i = subset(data_2.1, Grouping == i)
+  group_size = nrow(group_i)
+  max_sum = 0
+  min_sum = 0
+  for(j in seq(group_size)){
+    comp_level = group_i$comp_level[j] + 0.5
+    max_sum = max_sum + income_max[comp_level]
+    min_sum = min_sum + income_min[comp_level]
+  }
+  avg_max[i] = max_sum/group_size
+  avg_min[i] = min_sum/group_size
+}
+```
+
+```{r}
+plot(avg_comp, type = "o", xlab = "Group", ylim = c(avg_min[2] ,avg_max[6]))
+
+for(i in seq(199)){
+  for(j in seq(6)){
+    diff = avg_max[j] - avg_comp[j]
+    points(j+(i-100)*0.0005,avg_max[j], pch = 20)
+    points(j+(i-100)*0.0005,avg_min[j], pch = 20)
+    points(j,avg_comp[j]+(i-100)*diff/100, pch = 20)
+  }
+}
+```
+
+
+
+// Section 2.3
+
+```{r}
+for(i in ind){
+  comp_level = data_2.1$comp_level[i]+0.5
+  set.seed(i)
+  data_2.1$Compensation[i] = runif(1,min = income_min[comp_level], max = income_max[comp_level])
+}
+```
+
+```{r}
+for(i in ind){
+  Code_time = data_2.1$Q6[i]
+  ML_time = data_2.1$Q15[i]
+  total_time = 0
+  
+  set.seed(i)
+  if(Code_time == "< 1 years"){
+    total_time = total_time + runif(1, min= 0,max =1)
+  }
+  else if(Code_time == "1-2 years"){
+    total_time = total_time + runif(1, min= 1,max =2)
+  }
+  else if(Code_time == "3-5 years"){
+    total_time = total_time + runif(1, min= 3,max =5)
+  }
+  else if(Code_time == "5-10 years"){
+    total_time = total_time + runif(1, min= 5,max =10)
+  }
+  else if(Code_time == "10-20 years"){
+    total_time = total_time + runif(1, min= 10,max =20)
+  }
+  else if(Code_time == "20+ years"){
+    total_time = total_time + runif(1, min= 20,max =40)
+  }
+  
+  if(ML_time == "Under 1 year"){
+    total_time = total_time + runif(1, min= 0,max =1)
+  }
+  else if(ML_time == "1-2 years"){
+    total_time = total_time + runif(1, min= 1,max =2)
+  }
+  else if(ML_time == "2-3 years"){
+    total_time = total_time + runif(1, min= 2,max =3)
+  }
+  else if(ML_time == "3-4 years"){
+    total_time = total_time + runif(1, min= 3,max =4)
+  }
+  else if(ML_time == "4-5 years"){
+    total_time = total_time + runif(1, min= 4,max =5)
+  }
+  else if(ML_time == "5-10 years"){
+    total_time = total_time + runif(1, min= 5,max =10)
+  }
+  else if(ML_time == "10-20 years"){
+    total_time = total_time + runif(1, min= 10,max =20)
+  }
+  else if(ML_time == "20 or more years"){
+    total_time = total_time + runif(1, min= 20,max =40)
+  }
+  
+  data_2.1$Spread_time[i] = total_time
+}
+```
+
+
+
+
+```{r}
+breaks = seq(1,79,length.out = 40)
+freqs = seq(0,0,length.out = 40)
+sums = seq(0,0,length.out = 40)
+
+for(i in ind){
+  S_t = data_2.1$Spread_time[i]
+  CP = data_2.1$Compensation[i]
+  group = floor(S_t/2)+1
+  freqs[group] = freqs[group]+1
+  sums[group] = sums[group]+CP
+}
+
+avgs = seq(40)
+for(i in seq(40)){
+  avgs[i] = sums[i]/freqs[i]
+}
+
+```
+
+```{r}
+linear_model = lm(avgs~breaks)
+summary(linear_model)
+```
+
+```{r}
+plot(data_2.1$Compensation~data_2.1$Spread_time,pch=20)
+abline(linear_model, col = "red")
+
+for(i in seq(40)){
+  points(breaks[i],sums[i]/freqs[i], col="red",pch = 19)
+}
+```
+
+```{r}
+plot(linear_model$residuals~breaks, pch=20)
+abline(h = 0, col='rosybrown2', lwd = 3)
+```
+
+```{r}
+qqnorm(linear_model$residuals)
+qqline(linear_model$residuals, col="red")
+```
+
+
+
+//Section 2.4
+```{r}
+data_male = subset(data,Q2 == "Man")
+data_female = subset(data,Q2 == "Woman")
+```
+
+```{r}
+wanted_columns = c("Q6","Q15","Q24")
+data_male = subset(data_male, select = wanted_columns)
+data_male = subset(data_male, Q6!= "" & Q24 !="")
+
+data_female = subset(data_female, select = wanted_columns)
+data_female = subset(data_female, Q6!= "" & Q24 !="")
+```
+
+```{r}
+ind_male = seq(nrow(data_male))
+ind_female = seq(nrow(data_female))
+```
+
+```{r}
+for(i in ind_male){
+  Code_time = data_male$Q6[i]
+  ML_time = data_male$Q15[i]
+  total_time = 0
+  
+  set.seed(i)
+  if(Code_time == "< 1 years"){
+    total_time = total_time + runif(1, min= 0,max =1)
+  }
+  else if(Code_time == "1-2 years"){
+    total_time = total_time + runif(1, min= 1,max =2)
+  }
+  else if(Code_time == "3-5 years"){
+    total_time = total_time + runif(1, min= 3,max =5)
+  }
+  else if(Code_time == "5-10 years"){
+    total_time = total_time + runif(1, min= 5,max =10)
+  }
+  else if(Code_time == "10-20 years"){
+    total_time = total_time + runif(1, min= 10,max =20)
+  }
+  else if(Code_time == "20+ years"){
+    total_time = total_time + runif(1, min= 20,max =30)
+  }
+  
+  if(ML_time == "Under 1 year"){
+    total_time = total_time + runif(1, min= 0,max =1)
+  }
+  else if(ML_time == "1-2 years"){
+    total_time = total_time + runif(1, min= 1,max =2)
+  }
+  else if(ML_time == "2-3 years"){
+    total_time = total_time + runif(1, min= 2,max =3)
+  }
+  else if(ML_time == "3-4 years"){
+    total_time = total_time + runif(1, min= 3,max =4)
+  }
+  else if(ML_time == "4-5 years"){
+    total_time = total_time + runif(1, min= 4,max =5)
+  }
+  else if(ML_time == "5-10 years"){
+    total_time = total_time + runif(1, min= 5,max =10)
+  }
+  else if(ML_time == "10-20 years"){
+    total_time = total_time + runif(1, min= 10,max =20)
+  }
+  else if(ML_time == "20 or more years"){
+    total_time = total_time + runif(1, min= 20,max =30)
+  }
+  
+  data_male$Spread_time[i] = total_time
+  
+  comp = data_male$Q24[i]
+  
+  if(comp == "$0-999"){
+    comp_level = 0.5
+  }
+  else if(comp == "1,000-1,999"){
+    comp_level = 1.5
+  }
+  else if(comp == "2,000-2,999"){
+    comp_level = 2.5
+  }
+  else if(comp == "3,000-3,999"){
+    comp_level = 3.5
+  }
+  else if(comp == "4,000-4,999"){
+    comp_level = 4.5
+  }
+  else if(comp == "5,000-7,499"){
+    comp_level = 5.5
+  }
+  else if(comp == "7,500-9,999"){
+    comp_level = 6.5
+  }
+  else if(comp == "10,000-14,999"){
+    comp_level = 7.5
+  }
+  else if(comp == "15,000-19,999"){
+    comp_level = 8.5
+  }
+  else if(comp == "20,000-24,999"){
+    comp_level = 9.5
+  }
+  else if(comp == "25,000-29,999"){
+    comp_level = 10.5
+  }
+  else if(comp == "30,000-39,999"){
+    comp_level = 11.5
+  }
+  else if(comp == "40,000-49,999"){
+    comp_level = 12.5
+  }
+  else if(comp == "50,000-59,999"){
+    comp_level = 13.5
+  }
+  else if(comp == "60,000-69,999"){
+    comp_level = 14.5
+  }
+  else if(comp == "70,000-79,999"){
+    comp_level = 15.5
+  }
+  else if(comp == "80,000-89,999"){
+    comp_level = 16.5
+  }
+  else if(comp == "90,000-99,999"){
+    comp_level = 17.5
+  }
+  else if(comp == "100,000-124,999"){
+    comp_level = 18.5
+  }
+  else if(comp == "125,000-149,999"){
+    comp_level = 19.5
+  }
+  else if(comp == "150,000-199,999"){
+    comp_level = 20.5
+  }
+  else if(comp == "200,000-249,999"){
+    comp_level = 21.5
+  }
+  else if(comp == "250,000-299,999"){
+    comp_level = 22.5
+  }
+  else if(comp == "300,000-500,000"){
+    comp_level = 23.5
+  }
+  else if(comp == "> $500,000"){
+    comp_level = 24.5
+  }
+  
+  data_male$Compensation[i] = runif(1,min = income_min[comp_level+0.5], max = income_max[comp_level+0.5])
+}
+```
+
+```{r}
+for(i in ind_female){
+  Code_time = data_female$Q6[i]
+  ML_time = data_female$Q15[i]
+  total_time = 0
+  
+  set.seed(i)
+  if(Code_time == "< 1 years"){
+    total_time = total_time + runif(1, min= 0,max =1)
+  }
+  else if(Code_time == "1-2 years"){
+    total_time = total_time + runif(1, min= 1,max =2)
+  }
+  else if(Code_time == "3-5 years"){
+    total_time = total_time + runif(1, min= 3,max =5)
+  }
+  else if(Code_time == "5-10 years"){
+    total_time = total_time + runif(1, min= 5,max =10)
+  }
+  else if(Code_time == "10-20 years"){
+    total_time = total_time + runif(1, min= 10,max =20)
+  }
+  else if(Code_time == "20+ years"){
+    total_time = total_time + runif(1, min= 20,max =30)
+  }
+  
+  if(ML_time == "Under 1 year"){
+    total_time = total_time + runif(1, min= 0,max =1)
+  }
+  else if(ML_time == "1-2 years"){
+    total_time = total_time + runif(1, min= 1,max =2)
+  }
+  else if(ML_time == "2-3 years"){
+    total_time = total_time + runif(1, min= 2,max =3)
+  }
+  else if(ML_time == "3-4 years"){
+    total_time = total_time + runif(1, min= 3,max =4)
+  }
+  else if(ML_time == "4-5 years"){
+    total_time = total_time + runif(1, min= 4,max =5)
+  }
+  else if(ML_time == "5-10 years"){
+    total_time = total_time + runif(1, min= 5,max =10)
+  }
+  else if(ML_time == "10-20 years"){
+    total_time = total_time + runif(1, min= 10,max =20)
+  }
+  else if(ML_time == "20 or more years"){
+    total_time = total_time + runif(1, min= 20,max =30)
+  }
+  
+  data_female$Spread_time[i] = total_time
+  
+  comp = data_female$Q24[i]
+  
+  if(comp == "$0-999"){
+    comp_level = 0.5
+  }
+  else if(comp == "1,000-1,999"){
+    comp_level = 1.5
+  }
+  else if(comp == "2,000-2,999"){
+    comp_level = 2.5
+  }
+  else if(comp == "3,000-3,999"){
+    comp_level = 3.5
+  }
+  else if(comp == "4,000-4,999"){
+    comp_level = 4.5
+  }
+  else if(comp == "5,000-7,499"){
+    comp_level = 5.5
+  }
+  else if(comp == "7,500-9,999"){
+    comp_level = 6.5
+  }
+  else if(comp == "10,000-14,999"){
+    comp_level = 7.5
+  }
+  else if(comp == "15,000-19,999"){
+    comp_level = 8.5
+  }
+  else if(comp == "20,000-24,999"){
+    comp_level = 9.5
+  }
+  else if(comp == "25,000-29,999"){
+    comp_level = 10.5
+  }
+  else if(comp == "30,000-39,999"){
+    comp_level = 11.5
+  }
+  else if(comp == "40,000-49,999"){
+    comp_level = 12.5
+  }
+  else if(comp == "50,000-59,999"){
+    comp_level = 13.5
+  }
+  else if(comp == "60,000-69,999"){
+    comp_level = 14.5
+  }
+  else if(comp == "70,000-79,999"){
+    comp_level = 15.5
+  }
+  else if(comp == "80,000-89,999"){
+    comp_level = 16.5
+  }
+  else if(comp == "90,000-99,999"){
+    comp_level = 17.5
+  }
+  else if(comp == "100,000-124,999"){
+    comp_level = 18.5
+  }
+  else if(comp == "125,000-149,999"){
+    comp_level = 19.5
+  }
+  else if(comp == "150,000-199,999"){
+    comp_level = 20.5
+  }
+  else if(comp == "200,000-249,999"){
+    comp_level = 21.5
+  }
+  else if(comp == "250,000-299,999"){
+    comp_level = 22.5
+  }
+  else if(comp == "300,000-500,000"){
+    comp_level = 23.5
+  }
+  else if(comp == "> $500,000"){
+    comp_level = 24.5
+  }
+  
+  data_female$Compensation[i] = runif(1,min = income_min[comp_level+0.5], max = income_max[comp_level+0.5])
+}
+```
+
+```{r}
+male_lm = lm(data_male$Compensation~data_male$Spread_time)
+summary(male_lm)
+```
+
+```{r}
+female_lm = lm(data_female$Compensation~data_female$Spread_time)
+summary(female_lm)
+```
+
+```{r}
+plot(data_male$Compensation~data_male$Spread_time,pch=20, col = "red")
+abline(male_lm, col = "rosybrown", lwd = 3)
+
+for(i in ind_female){
+  points(data_female$Spread_time[i],data_female$Compensation[i],pch = 20, col = "royalblue")
+}
+
+abline(female_lm, col = "skyblue", lwd = 3)
+```
+
+
+
+//Section 3.0
+```{r}
+wanted_columns = c("Q6","Q15","Q7_Part_1","Q8","Q7_Part_2","Q7_Part_3","Q7_Part_4","Q7_Part_5","Q7_Part_6","Q7_Part_7","Q7_Part_8","Q7_Part_9","Q7_Part_10","Q7_Part_11","Q7_Part_12")
+data_3 = subset(data, select = wanted_columns)
+data_3 = subset(data_3, Q6!= "")
+```
+
+```{r}
+ind_3 = seq(nrow(data_3))
+```
+
+```{r}
+for(i in ind_3){
+  Code_time = data_3$Q6[i]
+  ML_time = data_3$Q15[i]
+  total_time = 0
+  
+
+  if(Code_time == "< 1 years"){
+    total_time = total_time + 0.5
+  }
+  else if(Code_time == "1-2 years"){
+    total_time = total_time + 1.5
+  }
+  else if(Code_time == "3-5 years"){
+    total_time = total_time + 4
+  }
+  else if(Code_time == "5-10 years"){
+    total_time = total_time + 7.5
+  }
+  else if(Code_time == "10-20 years"){
+    total_time = total_time + 15
+  }
+  else if(Code_time == "20+ years"){
+    total_time = total_time + 30
+  }
+  
+  if(ML_time == "Under 1 year"){
+    total_time = total_time + 0.5
+  }
+  else if(ML_time == "1-2 years"){
+    total_time = total_time + 1.5
+  }
+  else if(ML_time == "2-3 years"){
+    total_time = total_time + 2.5
+  }
+  else if(ML_time == "3-4 years"){
+    total_time = total_time + 3.5
+  }
+  else if(ML_time == "4-5 years"){
+    total_time = total_time + 4.5
+  }
+  else if(ML_time == "5-10 years"){
+    total_time = total_time + 7.5
+  }
+  else if(ML_time == "10-20 years"){
+    total_time = total_time + 15
+  }
+  else if(ML_time == "20 or more years"){
+    total_time = total_time + 30
+  }
+  
+
+  if(total_time <= 2){
+    data_3$Grouping[i] = 1
+  }
+  else if(total_time <= 4){
+    data_3$Grouping[i] = 2
+  }
+  else if(total_time <= 7){
+    data_3$Grouping[i] = 3
+  }
+  else if(total_time <= 10){
+    data_3$Grouping[i] = 4
+  }
+  else if(total_time <= 15){
+    data_3$Grouping[i] = 5
+  }
+  else{
+    data_3$Grouping[i] = 6
+  }
+}
+```
+
+```{r}
+
+par(mfrow=c(3,2))
+for(i in seq(6)){
+  group_i = subset(data_3, Grouping == i)
+  ind_i = seq(nrow(group_i))
+  
+  
+  occur = c(0,0,0,0,0,0,0,0,0)
+  names(occur) = c("Python","Java","R","C++","MATLAB","C","SQL","blank","others")
+  for(j in ind_i){
+    rec = group_i$Q8[j]
+    
+    if(rec == "Python"){
+      occur[1] = occur[1]+1
+    }
+    else if(rec == "Java"){
+      occur[2] = occur[2]+1
+    }
+    else if(rec == "R"){
+      occur[3] = occur[3]+1
+    }
+    else if(rec == "C++"){
+      occur[4] = occur[4]+1
+    }
+    else if(rec == "Matlab"){
+      occur[5] = occur[5]+1
+    }
+    else if(rec == "C"){
+      occur[6] = occur[6]+1
+    }
+    else if(rec == "SQL"){
+      occur[7] = occur[7]+1
+    }
+    else if(rec == ""){
+      occur[8] = occur[8]+1
+    }
+    else{
+      occur[9] = occur[9]+1
+    }
+  }
+  pie(occur, labels = round(occur/sum(occur),2),col = rainbow(9), main = headers[i], radius = 2)
+}
+
+```
+
+```{r}
+plot(seq(4),seq(4))
+legend("topright",c("Python","Java","R","C++","MATLAB","C","SQL","blank","others"), fill = rainbow(9),cex = 1)
+```
+
+
+```{r}
+par(mfrow=c(3,2))
+for(i in seq(6)){
+  group_i = subset(data_3, Grouping == i)
+  ind_i = seq(nrow(group_i))
+  
+  
+  occur = c(0,0,0,0,0,0,0,0,0,0,0,0)
+  names(occur) = c("Python","R","SQL","C","C++","Java","JS","Julia","Swift","Bash","MATLAB","None")
+  for(j in ind_i){
+    if(group_i$Q7_Part_1[j] != ""){
+      occur[1]= occur[1] +1
+    }
+    if(group_i$Q7_Part_2[j] != ""){
+      occur[2]= occur[2] +1
+    }
+    if(group_i$Q7_Part_3[j] != ""){
+      occur[3]= occur[3] +1
+    }
+    if(group_i$Q7_Part_4[j] != ""){
+      occur[4]= occur[4] +1
+    }
+    if(group_i$Q7_Part_5[j] != ""){
+      occur[5]= occur[5] +1
+    }
+    if(group_i$Q7_Part_6[j] != ""){
+      occur[6]= occur[6] +1
+    }
+    if(group_i$Q7_Part_7[j] != ""){
+      occur[7]= occur[7] +1
+    }
+    if(group_i$Q7_Part_8[j] != ""){
+      occur[8]= occur[8] +1
+    }
+    if(group_i$Q7_Part_9[j] != ""){
+      occur[9]= occur[9] +1
+    }
+    if(group_i$Q7_Part_10[j] != ""){
+      occur[10]= occur[10] +1
+    }
+    if(group_i$Q7_Part_11[j] != ""){
+      occur[11]= occur[11] +1
+    }
+    if(group_i$Q7_Part_12[j] != ""){
+      occur[12]= occur[12] +1
+    }
+  }
+  
+  barplot(occur/(nrow(group_i)),main = headers[i])
+}
+```
+
+
